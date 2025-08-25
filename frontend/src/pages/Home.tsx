@@ -1,13 +1,14 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Layout from '../components/Layout';
 
 function Home() {
     return (
         <>
-            <Navbar></Navbar>
-            <div>Home</div>
+            <Layout>
+                <h1>Home</h1>
+            </Layout>
         </>
     )
 }
