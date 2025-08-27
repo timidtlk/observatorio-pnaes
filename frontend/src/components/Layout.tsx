@@ -12,7 +12,7 @@ function Layout( { children }: Props ) {
     return (
         <>
             <Navbar />
-            <div className='container'>
+            <div className='container-fluid p-0'>
                 {children}
             </div>
             <VLibras />
