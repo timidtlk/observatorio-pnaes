@@ -4,7 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function Footer() {
     return (
-        <footer className="container-fluid bg-light text-center pt-5 pb-5">
+        <footer className="container-fluid bg-dark text-white text-center pt-5 pb-5">
             <p>&copy; 2025 Observatório do PNAES. Todos os direitos reservados</p>
         </footer>
     )

@@ -2,10 +2,9 @@
 import React from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
-import VLibras from './VLibras';
 
 interface Props {
-  children: any;
+    children: any;
 }
 
 function Layout( { children }: Props ) {
@@ -15,7 +14,6 @@ function Layout( { children }: Props ) {
             <div className='container-fluid p-0'>
                 {children}
             </div>
-            <VLibras />
             <Footer />
         </>
     )
