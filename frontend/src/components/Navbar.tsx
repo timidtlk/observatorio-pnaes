@@ -23,7 +23,7 @@ function Navbar() {
                         <Link className="nav-link" to="javascript:void(0)">Gráficos</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="javascript:void(0)">Sobre Nós</Link>
+                        <Link className="nav-link" to="/about">Sobre Nós</Link>
                     </li>
                 </ul>
                 <form className="d-flex">

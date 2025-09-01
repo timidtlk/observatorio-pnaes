@@ -4,17 +4,17 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Link } from 'react-router-dom';
 import LinkCard from '../components/LinkCard';
 import Counter from '../components/Counter';
+import Header from '../components/Header';
 
 function Home() {
     return (
         <>
-            <section className='container-fluid p-5 bg-dark text-white text-center'>
-                <h1 className='display-1'>Observatório do PNAES</h1>
+            <Header title='Observatório da Vida e Permanência Estudantil'>
                 <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
                 <Link to='' className='btn btn-primary btn-lg mt-4'>
                     <i className="bi bi-database" /> Explorar Dados
                 </Link>
-            </section>
+            </Header>
 
             <section className='container py-5'>
                 <div className='row g-4'>
