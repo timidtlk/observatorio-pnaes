@@ -33,3 +33,5 @@ build/
 .vscode/
 
 application.yml
+data.sql
+/src/main/resources/images/members/

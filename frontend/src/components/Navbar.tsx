@@ -7,7 +7,7 @@ function Navbar() {
     return (
         <nav className="navbar navbar-expand-xl navbar-light bg-light sticky-top">
             <div className="container">
-                <Link className="navbar-brand" to="/"><i className="bi bi-pie-chart fs-5"></i> Observatório do PNAES</Link>
+                <Link className="navbar-brand" to="/"><i className="bi bi-pie-chart fs-5"></i> Observatório da Vida e Permanência Estudantil</Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                     <span className="navbar-toggler-icon"></span>
                 </button>

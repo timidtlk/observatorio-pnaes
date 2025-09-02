@@ -10,7 +10,7 @@ interface Props {
 function Header({ children, title }: Props) {
     return (
         <section className='container-fluid p-5 bg-dark text-white text-center'>
-            <h1 className='display-1'>{title}</h1>
+            <h1 className='display-3'>{title}</h1>
             {children}
         </section>
     )

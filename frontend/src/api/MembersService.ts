@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { IMember } from "./Utils";
 
-const API_URI: string = "http://localhost:8080/members";
+export const API_URI: string = "http://localhost:8080/members";
 
 export async function createMember(member: IMember) {
     return axios.post(API_URI, member);

@@ -1,10 +1,12 @@
 package com.timidtlk.observatorio.controller;
 
+import static com.timidtlk.observatorio.utils.Constants.IMAGE_PATH;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -54,6 +56,11 @@ public class MemberController {
 
     @GetMapping(path = "/image/{filename}", produces = { IMAGE_PNG_VALUE, IMAGE_JPEG_VALUE })
     public byte[] getPhoto(@PathVariable("filename") String filename) throws IOException {
-        return Files.readAllBytes(Paths.get("" + filename));
+        try {
+            return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(IMAGE_PATH + filename).toURI()));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
