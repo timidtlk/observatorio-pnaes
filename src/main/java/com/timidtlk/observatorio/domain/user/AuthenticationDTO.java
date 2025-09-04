@@ -1,3 +1,3 @@
-package com.timidtlk.observatorio.domain;
+package com.timidtlk.observatorio.domain.user;
 
 public record AuthenticationDTO(String login, String password) {}

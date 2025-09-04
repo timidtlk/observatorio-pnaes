@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.timidtlk.observatorio.domain.AuthenticationDTO;
-import com.timidtlk.observatorio.domain.LoginResponseDTO;
-import com.timidtlk.observatorio.domain.RegisterDTO;
-import com.timidtlk.observatorio.domain.User;
+import com.timidtlk.observatorio.domain.user.AuthenticationDTO;
+import com.timidtlk.observatorio.domain.user.LoginResponseDTO;
+import com.timidtlk.observatorio.domain.user.RegisterDTO;
+import com.timidtlk.observatorio.domain.user.User;
 import com.timidtlk.observatorio.infra.security.TokenService;
 import com.timidtlk.observatorio.repository.UserRepository;
 

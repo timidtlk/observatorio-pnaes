@@ -55,6 +55,10 @@ public class SecurityConfiguration {
                     .requestMatchers(PUT, "/members").authenticated()
                     .requestMatchers(GET, "/members").permitAll()
                     .requestMatchers(GET, "/members/image/**").permitAll()
+                    .requestMatchers(POST, "/posts").authenticated()
+                    .requestMatchers(DELETE, "/posts").authenticated()
+                    .requestMatchers(PUT, "/posts").authenticated()
+                    .requestMatchers(GET, "/posts").permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

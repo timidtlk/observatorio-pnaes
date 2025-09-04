@@ -7,9 +7,13 @@ import org.springframework.stereotype.Service;
 
 import com.timidtlk.observatorio.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
+@Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 public class AuthorizationService implements UserDetailsService {
     private UserRepository repository;

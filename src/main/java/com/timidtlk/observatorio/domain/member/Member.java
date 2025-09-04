@@ -1,4 +1,4 @@
-package com.timidtlk.observatorio.domain;
+package com.timidtlk.observatorio.domain.member;
 
 import java.util.Collection;
 import java.util.List;

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.timidtlk.observatorio.domain.Member;
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.repository.MemberRepository;
 
 import jakarta.transaction.Transactional;
@@ -50,7 +50,7 @@ public class MemberService {
     }
 
     public void deleteMember(Member member) {
-        // TODO: Method not implemented
+        memberRepo.delete(member);
     }
 
     public String uploadPhoto(UUID id, MultipartFile file) {

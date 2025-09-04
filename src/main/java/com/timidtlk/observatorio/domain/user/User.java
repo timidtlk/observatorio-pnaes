@@ -1,4 +1,4 @@
-package com.timidtlk.observatorio.domain;
+package com.timidtlk.observatorio.domain.user;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.enums.Role;
 
 import jakarta.persistence.Column;

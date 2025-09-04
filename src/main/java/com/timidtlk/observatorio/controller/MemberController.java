@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.timidtlk.observatorio.domain.Member;
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.service.MemberService;
 
 import lombok.RequiredArgsConstructor;

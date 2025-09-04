@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.timidtlk.observatorio.domain.Member;
+import com.timidtlk.observatorio.domain.member.Member;
 
 public interface MemberRepository extends JpaRepository<Member, UUID> {
     Optional<Member> findByName(String name);
