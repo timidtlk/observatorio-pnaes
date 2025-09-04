@@ -34,3 +34,7 @@ server:
     path: /log
     whitelabel:
       enabled: false
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:my_secure_app}

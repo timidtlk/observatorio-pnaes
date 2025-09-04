@@ -7,14 +7,14 @@ function Navbar() {
     return (
         <nav className="navbar navbar-expand-xl navbar-light bg-light sticky-top">
             <div className="container">
-                <Link className="navbar-brand" to="/"><i className="bi bi-pie-chart fs-5"></i> Observatório da Vida e Permanência Estudantil</Link>
+                <Link className="navbar-brand text-xl-start text-break" to="/"><i className="bi bi-pie-chart fs-5"></i> <p className='d-none d-sm-inline'>Observatório da Vida e Permanência Estudantil</p></Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="mynavbar">
                 <ul className="navbar-nav me-auto">
                     <li className="nav-item">
-                        <Link className="nav-link" to="javascript:void(0)">Espaço Multimídia</Link>
+                        <Link className="nav-link" to="/multimedia">Espaço Multimídia</Link>
                     </li>
                     <li className="nav-item">
                         <Link className="nav-link" to="javascript:void(0)">Banco de Dados</Link>

@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.timidtlk.observatorio.domain.Member;
-import com.timidtlk.observatorio.repo.MemberRepo;
+import com.timidtlk.observatorio.repository.MemberRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 public class MemberService {
-    private final MemberRepo memberRepo;
-
-    @EventListener
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-
-    }
+    private final MemberRepository memberRepo;
 
     public List<Member> getAllMembers() {
         return memberRepo.findAll(Sort.by("name"));

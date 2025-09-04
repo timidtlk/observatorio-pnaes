@@ -7,7 +7,7 @@ import type { IMember } from '../api/Utils';
 
 const MEMBERS_PER_SLIDE = 3;
 
-function Sobre() {
+function About() {
     const [members, setMembers] = useState<IMember[]>([]);
     const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -81,11 +81,11 @@ function Sobre() {
             <section className="container pb-5">
                 <h3 className="text-center mb-4"><i className="bi bi-bullseye text-primary"></i> Nossa Missão</h3>
                 <p className="lead text-center">
-                    Promover a democratização do acesso à informação sobre a vida estudantil, subsidiando pesquisas, debates e políticas que fortaleçam a permanência e o êxito dos estudantes no ensino superior.
+                    Promover a democratização do acesso à informação sobre a vida estudantil, apresentando pesquisas, debates e políticas que ajudem a entender as políticas de assistência aos estudantes no ensino superior.
                 </p>
             </section>
         </>
     )
 }
 
-export default Sobre
+export default About

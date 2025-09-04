@@ -19,7 +19,7 @@ function Home() {
             <section className='container py-5'>
                 <div className='row g-4'>
                     <LinkCard icon="bi-database" title="Banco de dados" text="Lorem ipsum dolor sit amet consectetur adipisicing elit" btnText="Acessar" link="#" />
-                    <LinkCard icon="bi-play-btn" title="Espaço multimídia" text="Lorem ipsum dolor sit amet consectetur adipisicing elit" btnText="Explorar" link="#" />
+                    <LinkCard icon="bi-play-btn" title="Espaço multimídia" text="Lorem ipsum dolor sit amet consectetur adipisicing elit" btnText="Explorar" link="/multimedia" />
                     <LinkCard icon="bi-bar-chart" title="Gráficos" text="Lorem ipsum dolor sit amet consectetur adipisicing elit" btnText="Conferir" link="#" />
                 </div>
             </section>

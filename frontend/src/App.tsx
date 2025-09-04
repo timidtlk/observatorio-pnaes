@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Layout from './components/Layout';
 import VLibras from './components/VLibras';
-import Sobre from './pages/Sobre';
+import About from './pages/About';
+import Multimedia from './pages/Multimedia';
 
 function App() {
     return (
@@ -13,7 +14,8 @@ function App() {
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/home' element={<Home />} />
-                    <Route path='/about' element={<Sobre />} />
+                    <Route path='/about' element={<About />} />
+                    <Route path='/multimedia' element={<Multimedia />} />
                 </Routes>
             </Layout>
         </BrowserRouter>
