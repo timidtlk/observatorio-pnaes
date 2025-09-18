@@ -1,24 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Header from '../components/Header'
+import type { IPost } from '../api/Utils';
+import { Link } from 'react-router-dom';
 
 const contentTypes = ["Todos", "Entrevista", "Vídeo", "Podcast"];
 const POSTS_PER_PAGE = 10;
-
-interface Post {
-    id: number;
-    title: string;
-    type: string;
-    date: string;
-    description: string;
-    link: string;
-}
 
 function Multimedia() {
     const [selectedType, setSelectedType] = useState("Todos");
     const [selectedDate, setSelectedDate] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<IPost[]>([]);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -113,9 +106,8 @@ function Multimedia() {
                         </div>
                     ) : (
                         posts.map(post => (
-                            <a
-                                key={post.id}
-                                href={post.link}
+                            <Link
+                                to={`post/${post.link}`}
                                 className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-5"
                             >
                                 <div>
@@ -134,7 +126,7 @@ function Multimedia() {
                                     <i className="bi bi-calendar-event me-1" />
                                     {new Date(post.date).toLocaleDateString('pt-BR')}
                                 </span>
-                            </a>
+                            </Link>
                         ))
                     )}
                 </div>

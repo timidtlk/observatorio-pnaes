@@ -6,3 +6,14 @@ export interface IMember {
     lattes: string,
     photoUrl: string
 }
+
+export interface IPost {
+    id: string;
+    title: string;
+    type: string;
+    date: string;
+    content: string;
+    description: string;
+    link: string;
+    member: IMember;
+}

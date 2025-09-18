@@ -1,7 +1,6 @@
 package com.timidtlk.observatorio.enums;
 
 public enum Role {
-    GUEST("Guest"),
     MEMBER("Member"),
     ADMIN("Admin");
 

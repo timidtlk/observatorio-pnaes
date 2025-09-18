@@ -1,7 +1,5 @@
 package com.timidtlk.observatorio.controller;
 
-import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +27,11 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(@RequestParam(value = "page", defaultValue = "0") int page) {
+        return ResponseEntity.ok().body(postService.getAllPosts(page));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Post>> search(@PathVariable(name = "q") String searchTerm, @RequestParam(value = "page", defaultValue = "0") int page) {
         return ResponseEntity.ok().body(postService.getAllPosts(page));
     }
 

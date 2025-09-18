@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.enums.PostType;
 
 import jakarta.persistence.Column;
@@ -14,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -43,13 +45,16 @@ public class Post {
     @Column(length = 1000000)
     private String content;
     private String link;
+    @ManyToOne
+    private Member originalPoster;
 
-    public Post(String title, PostType type, String description, String content, String link) {
+    public Post(String title, PostType type, String description, String content, String link, Member originalPoster) {
         this.title = title;
         this.type = type;
         this.description = description;
         this.content = content;
         this.link = link;
+        this.originalPoster = originalPoster;
     }
 
     public PostResponseDTO toResponseDTO() {
@@ -61,5 +66,6 @@ public class Post {
         this.type = post.type();
         this.description = post.description();
         this.content = post.content();
+        this.originalPoster = post.originalPoster();
     }
 }

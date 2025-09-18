@@ -1,9 +1,5 @@
 package com.timidtlk.observatorio.service;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collector;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,7 +23,11 @@ public class PostService {
     private final int PAGE_SIZE = 10;
 
     public Page<Post> getAllPosts(int page) {
-        return postRepository.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by("created_on")));
+        return postRepository.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by("created_on").descending()));
+    }
+
+    public Page<Post> getPostsByTerm(String searchTerm, int page) {
+        return postRepository.search(searchTerm, PageRequest.of(page, PAGE_SIZE, Sort.by("created_on").descending()));
     }
 
     public PostResponseDTO getPost(String link) {

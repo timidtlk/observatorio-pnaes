@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.domain.user.AuthenticationDTO;
 import com.timidtlk.observatorio.domain.user.LoginResponseDTO;
 import com.timidtlk.observatorio.domain.user.RegisterDTO;
-import com.timidtlk.observatorio.domain.user.User;
 import com.timidtlk.observatorio.infra.security.TokenService;
-import com.timidtlk.observatorio.repository.UserRepository;
+import com.timidtlk.observatorio.repository.MemberRepository;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,7 +25,7 @@ import com.timidtlk.observatorio.repository.UserRepository;
 public class AuthenticationController {
     private AuthenticationManager authenticationManager;
     private TokenService tokenService;
-    private UserRepository userRepository;
+    private MemberRepository repository;
     private PasswordEncoder encoder;
 
     @PostMapping("/login")
@@ -33,7 +33,7 @@ public class AuthenticationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
 
-        var token = tokenService.generateToken((User) auth.getPrincipal());
+        var token = tokenService.generateToken((Member) auth.getPrincipal());
 
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
@@ -41,12 +41,12 @@ public class AuthenticationController {
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
-        if (userRepository.findByLogin(data.login()) != null) return ResponseEntity.badRequest().build();
+        if (repository.findByLogin(data.login()) != null) return ResponseEntity.badRequest().build();
 
         String encryptedPassword = encoder.encode(data.password());
-        User user = new User(data.login(), encryptedPassword, data.role());
+        Member user = new Member(data.login(), encryptedPassword, data.role());
 
-        userRepository.save(user);
+        repository.save(user);
 
         return ResponseEntity.ok().build();
     }

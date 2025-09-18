@@ -12,8 +12,6 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +57,7 @@ public class MemberService {
         String photoUrl = photoFunction.apply(id.toString(), file);
         member.setPhotoUrl(photoUrl);
         memberRepo.save(member);
+        
         return photoUrl;
     }
 
