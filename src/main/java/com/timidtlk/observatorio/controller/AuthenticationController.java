@@ -3,6 +3,7 @@ package com.timidtlk.observatorio.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,10 +24,14 @@ import com.timidtlk.observatorio.repository.MemberRepository;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
-    private AuthenticationManager authenticationManager;
-    private TokenService tokenService;
-    private MemberRepository repository;
-    private PasswordEncoder encoder;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    TokenService tokenService;
+    @Autowired
+    MemberRepository repository;
+    @Autowired
+    PasswordEncoder encoder;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data) {

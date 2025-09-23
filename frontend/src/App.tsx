@@ -5,7 +5,8 @@ import Layout from './components/Layout';
 import VLibras from './components/VLibras';
 import About from './pages/About';
 import Multimedia from './pages/Multimedia';
-import Post from './components/Post';
+import Post from './pages/Post';
+import Login from './pages/Login';
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                     <Route path='/about' element={<About />} />
                     <Route path='/multimedia' element={<Multimedia />} />
                     <Route path='/post/:link' element={<Post />} />
+                    <Route path='/login' element={<Login />} />
                 </Routes>
             </Layout>
         </BrowserRouter>

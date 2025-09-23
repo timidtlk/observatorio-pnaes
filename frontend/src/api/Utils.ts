@@ -17,3 +17,8 @@ export interface IPost {
     link: string;
     member: IMember;
 }
+
+export interface ILoginCredentials {
+    login: string;
+    password: string;
+}

@@ -1,5 +1,6 @@
 package com.timidtlk.observatorio.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 public class AuthorizationService implements UserDetailsService {
+    @Autowired
     private MemberRepository repository;
 
     @Override

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 function Navbar() {
     return (
-        <nav className="navbar navbar-expand-xl navbar-light bg-light sticky-top">
+        <nav className="navbar navbar-expand-xl navbar-light border-bottom-0 bg-light sticky-top">
             <div className="container">
                 <Link className="navbar-brand text-xl-start text-break" to="/"><i className="bi bi-pie-chart fs-5"></i> <p className='d-none d-sm-inline'>Observatório da Vida e Permanência Estudantil</p></Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
