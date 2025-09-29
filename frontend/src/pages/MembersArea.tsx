@@ -1,0 +1,286 @@
+import React, { useEffect, useRef, useState } from "react";
+import type { IMember, IPost } from "../api/Utils";
+import Header from "../components/Header";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { Link } from "react-router-dom";
+import { getMemberByToken } from "../api/MembersService";
+
+const getCurrentMemberToken = () => {
+    if (sessionStorage.getItem("token") !== null)
+        return sessionStorage.getItem("token") || "meu-id";
+    return localStorage.getItem("token") || "meu-id";
+};
+
+function MembersArea() {
+    const [member, setMember] = useState<IMember | null>(null);
+    const [editMember, setEditMember] = useState<IMember | null>(null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [posts, setPosts] = useState<IPost[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Carrega dados do membro e posts
+    useEffect(() => {
+        const fetchMemberAndPosts = async () => {
+            setLoading(true);
+            try {
+                const token = getCurrentMemberToken();
+                console.log(token);
+                // Buscar dados do membro
+                const memberData: IMember = await getMemberByToken() as unknown as IMember;
+                setMember(memberData);
+                setEditMember(memberData);
+                setPhotoPreview(memberData.photoUrl ? `/members/image/${memberData.photoUrl}` : null);
+
+                // Buscar posts do membro
+                const postsResp = await fetch(`/`);
+                const postsData = await postsResp.json();
+                setPosts(postsData.items || []);
+            } catch (err: unknown) {
+                console.log(err);
+                setMember(null);
+                setPosts([]);
+            }
+            setLoading(false);
+        };
+        fetchMemberAndPosts();
+    }, []);
+
+    // Preview da foto ao selecionar novo arquivo
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setPhotoFile(file);
+            setPhotoPreview(URL.createObjectURL(file));
+        }
+    };
+
+    // Atualiza campos do membro editável
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (!editMember) return;
+        const { name, value } = e.target;
+        setEditMember({ ...editMember, [name]: value });
+    };
+
+    // Salva alterações do membro
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editMember) return;
+        setSaving(true);
+
+        try {
+            // Atualiza dados do membro
+            await fetch(`/api/members/${editMember.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(editMember),
+            });
+
+            // Atualiza foto se houver novo arquivo
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append("file", photoFile);
+                await fetch(`/api/members/${editMember.id}/photo`, {
+                    method: "POST",
+                    body: formData,
+                });
+            }
+
+            // Atualiza estado local
+            setMember(editMember);
+            setPhotoFile(null);
+        } catch (err: unknown) {
+            alert(`Erro ao salvar dados: ${err}`);
+        }
+        setSaving(false);
+    };
+
+    // Editar post (redireciona para página de edição)
+    const handleEditPost = (postId: string) => {
+        window.location.href = `/edit-post/${postId}`;
+    };
+
+    // Deletar post
+    const handleDeletePost = async (postId: string) => {
+        if (!window.confirm("Tem certeza que deseja deletar este post?")) return;
+        try {
+            await fetch(`/api/posts/${postId}`, { method: "DELETE" });
+            setPosts(posts.filter((p) => p.id !== postId));
+        } catch (err: unknown) {
+            alert(`Erro ao deletar post: ${err}`);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="container py-5 text-center">
+                <span className="spinner-border text-primary" role="status"></span>
+            </div>
+        );
+    }
+
+    if (!member || !editMember) {
+        return (
+            <div className="container py-5 text-center">
+                <i className="bi bi-exclamation-triangle display-1 text-primary mb-4"></i>
+                <p>Não foi possível carregar seus dados.</p>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <Header title="Área do Membro">
+                <p>Gerencie seus dados e suas postagens no Observatório.</p>
+            </Header>
+            <section className="container py-5">
+                <div className="row g-4">
+                    <div className="col-lg-4">
+                        <div className="card shadow-sm">
+                            <div className="card-body text-center">
+                                <div className="mb-3">
+                                    <img
+                                        src={photoPreview || "/default-user.png"}
+                                        alt="Foto do membro"
+                                        className="rounded-circle border"
+                                        style={{ width: 140, height: 140, objectFit: "cover" }}
+                                    />
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="form-control mb-2"
+                                    ref={fileInputRef}
+                                    style={{ display: "none" }}
+                                    onChange={handlePhotoChange}
+                                />
+                                <button
+                                    className="btn btn-outline-primary btn-sm mb-3"
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <i className="bi bi-camera me-1"></i> Alterar foto
+                                </button>
+                                <form onSubmit={handleSave}>
+                                    <div className="mb-3 text-start">
+                                        <label className="form-label fw-bold">Nome</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="name"
+                                            value={editMember.name}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3 text-start">
+                                        <label className="form-label fw-bold">E-mail</label>
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            name="email"
+                                            value={editMember.email}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3 text-start">
+                                        <label className="form-label fw-bold">Currículo Lattes</label>
+                                        <input
+                                            type="url"
+                                            className="form-control"
+                                            name="lattes"
+                                            value={editMember.lattes}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-3 text-start">
+                                        <label className="form-label fw-bold">Descrição</label>
+                                        <textarea
+                                            className="form-control"
+                                            name="description"
+                                            rows={3}
+                                            value={editMember.description}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary w-100"
+                                        disabled={saving}
+                                    >
+                                        {saving ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                Salvando...
+                                            </>
+                                        ) : (
+                                            "Salvar alterações"
+                                        )}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-lg-8">
+                        <div className="card shadow-sm">
+                            <div className="card-header bg-white">
+                                <h4 className="mb-0">
+                                    <i className="bi bi-file-earmark-text me-2"></i>Minhas Postagens
+                                </h4>
+                            </div>
+                            <div className="card-body">
+                                {posts.length === 0 ? (
+                                    <div className="text-center text-muted py-4">
+                                        <i className="bi bi-exclamation-triangle display-4 mb-3"></i>
+                                        <p>Nenhuma postagem encontrada.</p>
+                                    </div>
+                                ) : (
+                                    <div className="list-group">
+                                        {posts.map((post) => (
+                                            <div
+                                                key={post.id}
+                                                className="list-group-item d-flex justify-content-between align-items-center"
+                                            >
+                                                <div>
+                                                    <h5 className="mb-1">{post.title}</h5>
+                                                    <small className="text-muted">
+                                                        {new Date(post.date).toLocaleDateString("pt-BR")}
+                                                    </small>
+                                                </div>
+                                                <div>
+                                                    <button
+                                                        className="btn btn-outline-secondary btn-sm me-2"
+                                                        onClick={() => handleEditPost(post.id)}
+                                                    >
+                                                        <i className="bi bi-pencil"></i> Editar
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => handleDeletePost(post.id)}
+                                                    >
+                                                        <i className="bi bi-trash"></i> Excluir
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="text-end mt-3">
+                            <Link to="/new-post" className="btn btn-success">
+                                <i className="bi bi-plus-circle me-1"></i> Nova Postagem
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </>
+    );
+}
+
+export default MembersArea;

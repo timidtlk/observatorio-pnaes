@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
+    @Autowired
     private TokenService tokenService;
     @Autowired
     private MemberRepository memberRepository;
@@ -43,5 +44,4 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (authHeader == null) return null;
         return authHeader.replace("Bearer ", "");
     }
-    
 }

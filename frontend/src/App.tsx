@@ -7,6 +7,7 @@ import About from './pages/About';
 import Multimedia from './pages/Multimedia';
 import Post from './pages/Post';
 import Login from './pages/Login';
+import MembersArea from './pages/MembersArea';
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                     <Route path='/multimedia' element={<Multimedia />} />
                     <Route path='/post/:link' element={<Post />} />
                     <Route path='/login' element={<Login />} />
+                    <Route path='/member' element={<MembersArea />} />
                 </Routes>
             </Layout>
         </BrowserRouter>

@@ -1,5 +1,6 @@
 package com.timidtlk.observatorio.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.domain.post.Post;
 
 @Repository
@@ -18,4 +20,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     @Query("FROM Post p WHERE LOWER(p.title) LIKE %:searchTerm%")
     Page<Post> search(@Param("searchTerm") String searchTerm, Pageable pageable);
+
+    @Query("FROM Post p WHERE originalPoster = :member")
+    List<Post> findByMember(@Param("member") Member member);
 }

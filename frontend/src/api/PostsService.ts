@@ -19,6 +19,10 @@ export async function getPostByLink(link: string) {
     return axios.get(`${API_URI}/${link}`);
 }
 
+export async function getPostsByUser(user: string) {
+    return axios.get(`${API_URI}/user/${user}`);
+}
+
 export async function updatePost(post: IPost) {
     return axios.put(API_URI, post);
 }

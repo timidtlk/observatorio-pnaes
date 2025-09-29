@@ -1,4 +1,6 @@
 package com.timidtlk.observatorio.domain.user;
 
-public record LoginResponseDTO(String token) {
+import java.util.UUID;
+
+public record LoginResponseDTO(String token, UUID uuid) {
 }

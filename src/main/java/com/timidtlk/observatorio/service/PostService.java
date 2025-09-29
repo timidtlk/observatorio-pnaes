@@ -1,5 +1,9 @@
 package com.timidtlk.observatorio.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -8,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.timidtlk.observatorio.domain.post.Post;
 import com.timidtlk.observatorio.domain.post.PostRequestDTO;
 import com.timidtlk.observatorio.domain.post.PostResponseDTO;
+import com.timidtlk.observatorio.repository.MemberRepository;
 import com.timidtlk.observatorio.repository.PostRepository;
 
 import jakarta.transaction.Transactional;
@@ -20,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PostService {
     private PostRepository postRepository;
+    @Autowired
+    private MemberRepository memberRepository;
     private final int PAGE_SIZE = 10;
 
     public Page<Post> getAllPosts(int page) {
@@ -60,5 +67,9 @@ public class PostService {
 
     public void deleteByLink(String link) {
         postRepository.delete(postRepository.findByLink(link).orElseThrow(() -> new RuntimeException("Post not found")));
+    }
+
+    public List<Post> getPostsByUser(UUID id) {
+        return postRepository.findByMember(memberRepository.findById(id).orElseThrow());
     }
 }
