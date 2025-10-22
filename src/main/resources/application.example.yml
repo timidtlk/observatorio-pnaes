@@ -3,6 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/observatorio
     username: observatorio
     password: securepassword
+    platform: postgresql
   jpa:
     database-platform: org.hibernate.dialect.PosgreSQLInnoDBDialect
     defer-datasource-initialization: true
