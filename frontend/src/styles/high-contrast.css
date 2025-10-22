@@ -1,0 +1,114 @@
+:root {
+  --hc-bg: #000;
+  --hc-surface: #0b0b0b;
+  --hc-text: #ffffff;
+  --hc-accent: #ffd54f;
+  --hc-border: #ffffff;
+  --hc-muted: #cfcfcf;
+}
+
+body.high-contrast {
+  background: var(--hc-bg) !important;
+  color: var(--hc-text) !important;
+}
+
+/* Surface elements */
+body.high-contrast .card,
+body.high-contrast .card-body,
+body.high-contrast .navbar,
+body.high-contrast .dropdown-menu,
+body.high-contrast .modal-content,
+body.high-contrast .list-group-item {
+  background: var(--hc-surface) !important;
+  color: var(--hc-text) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+
+/* Links and nav */
+body.high-contrast a,
+body.high-contrast .nav-link,
+body.high-contrast .text-primary,
+body.high-contrast .link {
+  color: var(--hc-accent) !important;
+  text-decoration: underline !important;
+}
+
+/* Buttons */
+body.high-contrast .btn,
+body.high-contrast .btn-outline-light,
+body.high-contrast .btn-outline-secondary {
+  background: transparent !important;
+  color: var(--hc-text) !important;
+  border-color: var(--hc-border) !important;
+}
+
+body.high-contrast .btn-primary {
+  background: var(--hc-accent) !important;
+  color: #000 !important;
+  border-color: var(--hc-accent) !important;
+}
+
+/* Forms / inputs */
+body.high-contrast .form-control,
+body.high-contrast input,
+body.high-contrast select,
+body.high-contrast textarea {
+  background: #000 !important;
+  color: var(--hc-text) !important;
+  border: 2px solid var(--hc-border) !important;
+}
+
+/* Tables */
+body.high-contrast .table,
+body.high-contrast .table th,
+body.high-contrast .table td {
+  color: var(--hc-text) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+body.high-contrast .table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: rgba(255,255,255,0.02) !important;
+}
+
+/* Muted text */
+body.high-contrast .text-muted,
+body.high-contrast small,
+body.high-contrast .lead {
+  color: var(--hc-muted) !important;
+}
+
+/* Icons & images — avoid automatic inversion */
+body.high-contrast img {
+  filter: none !important;
+}
+
+/* Focus styles for keyboard navigation */
+body.high-contrast :focus {
+  outline: 3px solid var(--hc-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* Utility tweaks */
+body.high-contrast .rounded-pill {
+  border-radius: 999px;
+}
+
+/* Make sure shadows are subtle to keep contrast consistent */
+body.high-contrast .shadow,
+body.high-contrast .shadow-sm {
+  box-shadow: none !important;
+}
+
+/* Ensure navbar toggler visible */
+body.high-contrast .navbar-toggler {
+  border-color: var(--hc-border) !important;
+}
+
+/* Accessibility label contrast */
+body.high-contrast .badge,
+body.high-contrast .alert {
+  background: var(--hc-surface) !important;
+  color: var(--hc-text) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+}

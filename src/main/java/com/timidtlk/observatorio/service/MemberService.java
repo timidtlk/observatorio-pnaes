@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,15 +22,14 @@ import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.repository.MemberRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
-@RequiredArgsConstructor
 public class MemberService {
-    private final MemberRepository memberRepo;
+    @Autowired
+    MemberRepository memberRepo;
 
     public List<Member> getAllMembers() {
         return memberRepo.findAll(Sort.by("name"));
@@ -39,8 +39,8 @@ public class MemberService {
         return memberRepo.findById(id).orElseThrow(() -> new RuntimeException("Member not found"));
     }
 
-    public Member getMember(String name) {
-        return memberRepo.findByName(name).orElseThrow(() -> new RuntimeException("Member not found"));
+    public Member getMember(String login) {
+        return (Member) memberRepo.findByLogin(login).orElseThrow(() -> new RuntimeException("Member not found"));
     }
 
     public Member createMember(Member member) {

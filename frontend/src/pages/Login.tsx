@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import type { ILoginCredentials } from '../api/Utils';
 import { login } from '../api/AuthService';
+import { useNavigate } from 'react-router-dom';
+import '../styles/high-contrast.css';
 
 // Interface para os toasts
 interface ToastNotification {
@@ -27,6 +29,8 @@ function Login() {
         (ToastNotification & { isHiding?: boolean })[]
     >([]);
     const toastIdCounter = useRef(0);
+
+    const navigate = useNavigate();
 
     // Função para mostrar toast
     const showToast = (
@@ -90,16 +94,14 @@ function Login() {
                 const response = await login(credentials);
 
                 const token: string = response.data.token;
-                const uuid: string = response.data.uuid;
 
                 if (rememberMe) {
                     localStorage.setItem('token', token);
-                    localStorage.setItem('id', uuid);
                 } else {
                     sessionStorage.setItem('token', token);
-                    sessionStorage.setItem('id', uuid);
                 }
                 showToast('Login realizado com sucesso!', 'success');
+                navigate("/member");
             } catch (error) {
                 console.error('Erro no login:', error);
                 showToast('Login ou senha inválidos!');

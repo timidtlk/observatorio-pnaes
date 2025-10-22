@@ -12,8 +12,8 @@ export async function getMembers() {
     return axios.get(API_URI);
 }
 
-export async function getMember(uuid: string) {
-    return axios.get(`${API_URI}/${uuid}`, getConfig());
+export async function getMember() {
+    return axios.get(`${API_URI}/this`, getConfig());
 }
 
 export async function updateMember(member: IMember) {
@@ -24,7 +24,6 @@ export async function updatePhoto(formData: unknown) {
     return axios.put(`${API_URI}/photo`, formData, getConfig());
 }
 
-export async function getMemberByToken() {
-    console.log(getConfig());
-    return axios.get(`${API_URI}/this`, getConfig());
+export async function getMemberByToken(): Promise<IMember> {
+    return (await axios.get(`${API_URI}/this`, getConfig())).data;
 }

@@ -2,5 +2,5 @@ package com.timidtlk.observatorio.domain.user;
 
 import java.util.UUID;
 
-public record LoginResponseDTO(String token, UUID uuid) {
+public record LoginResponseDTO(String token) {
 }

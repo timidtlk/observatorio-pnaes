@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Header from '../components/Header'
-import type { IPost } from '../api/Utils';
+import type { IPage, IPost } from '../api/Utils';
 import { Link } from 'react-router-dom';
+import { getPosts } from '../api/PostsService';
+import '../styles/high-contrast.css';
 
 const contentTypes = ["Todos", "Entrevista", "Vídeo", "Podcast"];
 const POSTS_PER_PAGE = 10;
@@ -24,9 +26,11 @@ function Multimedia() {
             if (type !== "Todos") params.append('type', type);
             if (date) params.append('date', date);
 
-            const response = await fetch(`/api/multimedia?${params.toString()}`);
-            const data = await response.json();
-            setPosts(data.items);
+            const data: IPage = (await getPosts()).data as unknown as IPage;
+
+            console.log(getPosts());
+
+            setPosts(data.content);
             setTotalPages(data.totalPages);
         } catch (error: unknown) {
             setPosts([]);
@@ -107,7 +111,7 @@ function Multimedia() {
                     ) : (
                         posts.map(post => (
                             <Link
-                                to={`post/${post.link}`}
+                                to={`/post/${post.link}`}
                                 className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-5"
                             >
                                 <div>
@@ -124,7 +128,7 @@ function Multimedia() {
                                 </div>
                                 <span className="text-muted ms-3">
                                     <i className="bi bi-calendar-event me-1" />
-                                    {new Date(post.date).toLocaleDateString('pt-BR')}
+                                    {new Date(post.lastUpdatedOn).toLocaleDateString('pt-BR')}
                                 </span>
                             </Link>
                         ))

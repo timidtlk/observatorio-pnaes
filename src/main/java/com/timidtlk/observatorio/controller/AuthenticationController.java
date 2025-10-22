@@ -40,7 +40,7 @@ public class AuthenticationController {
 
         var token = tokenService.generateToken((Member) auth.getPrincipal());
         
-        return ResponseEntity.ok(new LoginResponseDTO(token, ((Member)auth.getPrincipal()).getId()));
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     @SuppressWarnings("rawtypes")

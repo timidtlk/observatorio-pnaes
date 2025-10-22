@@ -12,5 +12,5 @@ import com.timidtlk.observatorio.domain.member.Member;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, UUID> {
     Optional<Member> findByName(String name);
-    UserDetails findByLogin(String login);
+    Optional<UserDetails> findByLogin(String login);
 }

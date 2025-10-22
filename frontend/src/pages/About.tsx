@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import MemberCard from '../components/MemberCard';
 import { getMembers } from '../api/MembersService';
 import type { IMember } from '../api/Utils';
+import '../styles/high-contrast.css';
 
 const MEMBERS_PER_SLIDE = 3;
 

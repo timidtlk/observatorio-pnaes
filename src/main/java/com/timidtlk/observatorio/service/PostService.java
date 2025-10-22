@@ -16,25 +16,24 @@ import com.timidtlk.observatorio.repository.MemberRepository;
 import com.timidtlk.observatorio.repository.PostRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
-@RequiredArgsConstructor
 public class PostService {
+    @Autowired
     private PostRepository postRepository;
     @Autowired
     private MemberRepository memberRepository;
     private final int PAGE_SIZE = 10;
 
     public Page<Post> getAllPosts(int page) {
-        return postRepository.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by("created_on").descending()));
+        return postRepository.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by("createdOn").descending()));
     }
 
     public Page<Post> getPostsByTerm(String searchTerm, int page) {
-        return postRepository.search(searchTerm, PageRequest.of(page, PAGE_SIZE, Sort.by("created_on").descending()));
+        return postRepository.search(searchTerm, PageRequest.of(page, PAGE_SIZE, Sort.by("createdOn").descending()));
     }
 
     public PostResponseDTO getPost(String link) {
@@ -46,12 +45,12 @@ public class PostService {
     public PostResponseDTO createPost(PostRequestDTO postRequest) {
         String link = postRequest.title().toLowerCase().replaceAll(" ", "-");
 
-        if (getPost(link) != null) {
+        if (postRepository.findByLink(link).isPresent()) {
             int i = 0;
             String newLink = "";
             do {
                 newLink = link + "-" + ++i;
-            } while (getPost(newLink) != null);
+            } while (postRepository.findByLink(newLink).isPresent());
             link = newLink;
         }
 
@@ -67,6 +66,10 @@ public class PostService {
 
     public void deleteByLink(String link) {
         postRepository.delete(postRepository.findByLink(link).orElseThrow(() -> new RuntimeException("Post not found")));
+    }
+
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
     }
 
     public List<Post> getPostsByUser(UUID id) {

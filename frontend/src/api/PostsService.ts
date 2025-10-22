@@ -1,10 +1,11 @@
 import axios from "axios";
 import type { IPost } from "./Utils";
+import { getConfig } from "./AuthService";
 
 export const API_URI: string = "http://localhost:8080/posts";
 
-export async function createPost(post: IPost) {
-    return axios.post(API_URI, post);
+export async function createPost(post: Partial<IPost>) {
+    return axios.post(API_URI, post, getConfig());
 } 
 
 export async function getPosts() {
@@ -20,9 +21,9 @@ export async function getPostByLink(link: string) {
 }
 
 export async function getPostsByUser(user: string) {
-    return axios.get(`${API_URI}/user/${user}`);
+    return axios.get(`${API_URI}/user/${user}`, getConfig());
 }
 
 export async function updatePost(post: IPost) {
-    return axios.put(API_URI, post);
+    return axios.put(API_URI, post, getConfig());
 }

@@ -41,7 +41,8 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException e) {
-            return "";
+            // retorna null quando inválido (mais claro que string vazia)
+            return null;
         }
     }
 

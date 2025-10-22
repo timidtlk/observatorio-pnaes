@@ -3,6 +3,7 @@ package com.timidtlk.observatorio.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,18 +16,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.domain.post.Post;
 import com.timidtlk.observatorio.domain.post.PostRequestDTO;
 import com.timidtlk.observatorio.domain.post.PostResponseDTO;
+import com.timidtlk.observatorio.infra.security.TokenService;
+import com.timidtlk.observatorio.service.MemberService;
 import com.timidtlk.observatorio.service.PostService;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/posts")
-@RequiredArgsConstructor
 public class PostController {
-    private PostService postService;
+    @Autowired
+    MemberService memberService;
+    @Autowired
+    PostService postService;
+    @Autowired
+    TokenService tokenService;
+    
+
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getCount() {
+        return ResponseEntity.ok().body(postService.getAllPosts().size());
+    }
 
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(@RequestParam(value = "page", defaultValue = "0") int page) {
@@ -44,13 +58,22 @@ public class PostController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<Post>> getPostByUser(@PathVariable(value = "id") UUID id) {
+    public ResponseEntity<List<Post>> getPostsByUser(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.ok().body(postService.getPostsByUser(id));
     }
     
     @PostMapping
-    public ResponseEntity<PostResponseDTO> createPost(@RequestBody PostRequestDTO post) {
-        return ResponseEntity.ok().body(postService.createPost(post));
+    public ResponseEntity<PostResponseDTO> createPost(@RequestBody PostRequestDTO post, HttpServletRequest request) {
+        var authHeader = request.getHeader("Authorization");
+        if (authHeader == null) return null;
+        String token = authHeader.replace("Bearer ", "");
+
+        Member member = memberService.getMember(tokenService.validateToken(token));
+
+        Post newPost = post.toEntity();
+        newPost.setOriginalPoster(member);
+
+        return ResponseEntity.ok().body(postService.createPost(new PostRequestDTO(newPost)));
     }
 
     @PutMapping

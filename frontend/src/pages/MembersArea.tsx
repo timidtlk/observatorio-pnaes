@@ -3,14 +3,11 @@ import type { IMember, IPost } from "../api/Utils";
 import Header from "../components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { Link } from "react-router-dom";
-import { getMemberByToken } from "../api/MembersService";
-
-const getCurrentMemberToken = () => {
-    if (sessionStorage.getItem("token") !== null)
-        return sessionStorage.getItem("token") || "meu-id";
-    return localStorage.getItem("token") || "meu-id";
-};
+import { Link, useNavigate } from "react-router-dom";
+import { API_URI, getMemberByToken } from "../api/MembersService";
+import { getPostsByUser } from "../api/PostsService";
+import { logout } from "../api/AuthService";
+import '../styles/high-contrast.css';
 
 function MembersArea() {
     const [member, setMember] = useState<IMember | null>(null);
@@ -21,24 +18,18 @@ function MembersArea() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     // Carrega dados do membro e posts
     useEffect(() => {
         const fetchMemberAndPosts = async () => {
             setLoading(true);
             try {
-                const token = getCurrentMemberToken();
-                console.log(token);
-                // Buscar dados do membro
                 const memberData: IMember = await getMemberByToken() as unknown as IMember;
                 setMember(memberData);
                 setEditMember(memberData);
-                setPhotoPreview(memberData.photoUrl ? `/members/image/${memberData.photoUrl}` : null);
-
-                // Buscar posts do membro
-                const postsResp = await fetch(`/`);
-                const postsData = await postsResp.json();
-                setPosts(postsData.items || []);
+                setPhotoPreview(memberData.photoUrl ? `${API_URI}/image/${memberData.photoUrl}` : null);
+                setPosts((await getPostsByUser(memberData.id)).data as unknown as IPost[])
             } catch (err: unknown) {
                 console.log(err);
                 setMember(null);
@@ -72,14 +63,12 @@ function MembersArea() {
         setSaving(true);
 
         try {
-            // Atualiza dados do membro
             await fetch(`/api/members/${editMember.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(editMember),
             });
 
-            // Atualiza foto se houver novo arquivo
             if (photoFile) {
                 const formData = new FormData();
                 formData.append("file", photoFile);
@@ -89,13 +78,20 @@ function MembersArea() {
                 });
             }
 
-            // Atualiza estado local
             setMember(editMember);
             setPhotoFile(null);
         } catch (err: unknown) {
             alert(`Erro ao salvar dados: ${err}`);
         }
         setSaving(false);
+    };
+
+    // Logout
+    const handleLogout = () => {
+        if (!window.confirm("Deseja encerrar a sessão?")) return;
+        logout();
+        setMember(null);
+        navigate("/login");
     };
 
     // Editar post (redireciona para página de edição)
@@ -130,6 +126,8 @@ function MembersArea() {
             </div>
         );
     }
+
+    console.log(posts);
 
     return (
         <>
@@ -222,6 +220,14 @@ function MembersArea() {
                                         )}
                                     </button>
                                 </form>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-danger w-100 mt-2"
+                                    onClick={handleLogout}
+                                >
+                                    <i className="bi bi-box-arrow-right me-1"></i> Sair
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -248,7 +254,7 @@ function MembersArea() {
                                                 <div>
                                                     <h5 className="mb-1">{post.title}</h5>
                                                     <small className="text-muted">
-                                                        {new Date(post.date).toLocaleDateString("pt-BR")}
+                                                        {new Date(post.lastUpdatedOn).toLocaleDateString("pt-BR")}
                                                     </small>
                                                 </div>
                                                 <div>
@@ -272,7 +278,7 @@ function MembersArea() {
                             </div>
                         </div>
                         <div className="text-end mt-3">
-                            <Link to="/new-post" className="btn btn-success">
+                            <Link to="/add-post" className="btn btn-success">
                                 <i className="bi bi-plus-circle me-1"></i> Nova Postagem
                             </Link>
                         </div>

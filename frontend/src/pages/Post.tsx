@@ -3,25 +3,27 @@ import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../components/Header';
 import type { IPost } from '../api/Utils';
+import { getPostByLink } from '../api/PostsService';
+import '../styles/high-contrast.css';
 
 function Post() {
-	const { id } = useParams<{ id: string }>();
+	const { link } = useParams();
 	const [post, setPost] = useState<IPost | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchPost = async (postId: string) => {
+	const fetchPost = async (postLink: string) => {
 		setLoading(true);
 		setError(null);
 
 		try {
-			const response = await fetch(`/api/posts/${postId}`);
+			const response = await getPostByLink(postLink);
 
-			if (!response.ok) {
+			if (!response.status) {
 				throw new Error('Post não encontrado');
 			}
 
-			const data: IPost = await response.json();
+			const data: IPost = response.data;
 			setPost(data);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Erro ao carregar o post');
@@ -32,21 +34,47 @@ function Post() {
 	};
 
 	useEffect(() => {
-		if (id) {
-			fetchPost(id);
+		if (link) {
+			fetchPost(link);
 		}
-	}, [id]);
+	}, [link]);
+
+	const getTypeText = (type: string) => {
+		switch (type) {
+			case "INTERVIEW":
+				return "Entrevista";
+			case "VIDEO":
+				return "Vídeo";
+			case "PODCAST":
+				return "Podcast";
+			default:
+				return "Artigo";
+		}
+	}
 
 	const getTypeIcon = (type: string) => {
 		switch (type) {
 			case "Entrevista":
-				return "bi bi-mic-fill text-primary me-2";
+				return "bi bi-mic-fill text-white me-2";
 			case "Vídeo":
-				return "bi bi-camera-video-fill text-danger me-2";
+				return "bi bi-camera-video-fill text-white me-2";
 			case "Podcast":
-				return "bi bi-headphones text-success me-2";
+				return "bi bi-headphones text-white me-2";
 			default:
-				return "bi bi-file-earmark-text me-2";
+				return "bi bi-file-earmark-text text-white me-2";
+		}
+	};
+
+	const getTypeBadge = (type: string) => {
+		switch (type) {
+			case "Entrevista":
+				return "badge bg-primary rounded-pill";
+			case "Vídeo":
+				return "badge bg-danger rounded-pill";
+			case "Podcast":
+				return "badge bg-success rounded-pill";
+			default:
+				return "badge bg-dark rounded-pill";
 		}
 	};
 
@@ -125,26 +153,26 @@ function Post() {
 						<div className="card border-0 shadow-sm mb-4">
 							<div className="card-body">
 								<div className="d-flex justify-content-between align-items-start mb-3">
-									<span className="badge bg-primary rounded-pill">
-										<i className={getTypeIcon(post.type)}></i>
-										{post.type}
+									<span className={getTypeBadge(getTypeText(post.type))}>
+										<i className={getTypeIcon(getTypeText(post.type))}></i>
+										{getTypeText(post.type)}
 									</span>
 									<span className="text-muted">
 										<i className="bi bi-calendar-event me-1"></i>
-										{formatDate(post.date)}
+										{formatDate(post.lastUpdatedOn)}
 									</span>
 								</div>
 
 								<h1 className="h2 mb-3">{post.title}</h1>
 
-								{post.member && (
+								{post.originalPoster && (
 									<div className="d-flex align-items-center mb-4">
 										<div className="bg-light rounded-circle d-flex align-items-center justify-content-center me-3"
 											style={{ width: '50px', height: '50px' }}>
 											<i className="bi bi-person-fill text-muted"></i>
 										</div>
 										<div>
-											<h6 className="mb-0">{post.member.name}</h6>
+											<h6 className="mb-0">{post.originalPoster.name}</h6>
 										</div>
 									</div>
 								)}
@@ -153,23 +181,13 @@ function Post() {
 							</div>
 						</div>
 
-						{/* Post Content */}
-						<div className="card border-0 shadow-sm mb-4">
-							<div className="card-body">
-								<div
-									className="post-content"
-									dangerouslySetInnerHTML={{ __html: post.content }}
-								/>
-							</div>
-						</div>
-
 						{/* External Link */}
-						{post.link && (
+						{post.content && (
 							<div className="card border-0 shadow-sm mb-4">
 								<div className="card-body text-center">
 									<h5 className="card-title mb-3">Acesse o conteúdo completo</h5>
 									<a
-										href={post.link}
+										href={post.content}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="btn btn-primary btn-lg"

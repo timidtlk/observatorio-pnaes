@@ -34,9 +34,9 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/members")
-@RequiredArgsConstructor
 public class MemberController {
-    private final MemberService memberService;
+    @Autowired
+    MemberService memberService;
 
     @Autowired
     TokenService tokenService;
