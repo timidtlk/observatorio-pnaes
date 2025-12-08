@@ -1,5 +1,6 @@
 services:
   frontend:
+    image: ghcr.io/timidtlk/observatorio-pnaes:frontend
     build: ./frontend
     ports:
       - "5173:80"
@@ -20,6 +21,7 @@ services:
       timeout: 5s
       retries: 10
   backend:
+    image: ghcr.io/timidtlk/observatorio-pnaes:backend
     build: ./
     ports:
       - "8080:8080"
