@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import type { IStudent } from "../api/Utils";

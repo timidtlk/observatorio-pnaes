@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import type { ILoginCredentials } from '../api/Utils';
 import { login } from '../api/AuthService';
 import { useNavigate } from 'react-router-dom';

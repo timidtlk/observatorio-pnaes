@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Header from '../components/Header'
 import type { IPost } from '../api/Utils'

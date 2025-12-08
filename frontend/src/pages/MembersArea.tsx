@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { IMember, IPost } from "../api/Utils";
 import Header from "../components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";

@@ -2,6 +2,7 @@ package com.timidtlk.observatorio;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +24,7 @@ public class ObservatorioApplication {
 		return (args) -> {
 			try {
 				if (studentService.getStudents("", "", "", "").isEmpty()) {
-					FileInputStream io = new FileInputStream(new File(getClass().getClassLoader().getResource("db/data.csv").toURI()));
+					InputStream io = getClass().getClassLoader().getResourceAsStream("db/data.csv");
 					MultipartFile file = new MockMultipartFile("file.csv", io);
 					studentService.setDatabase(file);
 				}				

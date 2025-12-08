@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
 

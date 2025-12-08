@@ -1,36 +1,52 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import type { IStudent } from "../api/Utils";
-import { getStudents } from "../api/StudentsService";
+import { getStudents, getAllCampus } from "../api/StudentsService";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-// ...existing code...
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Charts() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [students, setStudents] = useState<IStudent[]>([]);
+    const [campusOptions, setCampusOptions] = useState<string[]>([]);
+    const [campus, setCampus] = useState<string>(""); // '' => Todos
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await getAllCampus();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const data = (res as any).data || [];
+                setCampusOptions(Array.isArray(data) ? data : []);
+            } catch (err: unknown) {
+                setCampusOptions([]);
+                console.log(err);
+            }
+        })();
+    }, []);
 
     useEffect(() => {
         (async () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await getStudents("", "", "", "");
+                const res = await getStudents(campus, "", "", "");
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const data = (res as any).data || [];
                 setStudents(data);
             } catch (err: unknown) {
                 console.error(err);
                 setError("Falha ao carregar dados.");
+                setStudents([]);
             } finally {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [campus]);
 
     const agg = students.reduce(
         (acc, s) => {
@@ -70,7 +86,7 @@ function Charts() {
             <Header title="Gráficos — Distribuição de Cotas">
                 <p>
                     Visualização da distribuição de estudantes por situação de cotas (S / N / O).
-                    Os valores são agregados pela coluna qtdPessoas do banco.
+                    Selecione um campus para filtrar ou deixe em "Todos".
                 </p>
             </Header>
 
@@ -83,14 +99,36 @@ function Charts() {
                     <div className="alert alert-danger">{error}</div>
                 ) : (
                     <>
+                        <div className="row mb-3">
+                            <div className="col-md-4">
+                                <label className="form-label">Campus</label>
+                                <select
+                                    className="form-select"
+                                    value={campus}
+                                    onChange={(e) => setCampus(e.target.value)}
+                                >
+                                    <option value="">Todos</option>
+                                    {campusOptions.map((c) => (
+                                        <option key={c} value={c}>
+                                            {c}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
                         <div className="row g-4">
                             <div className="col-md-6">
                                 <div className="card shadow-sm" style={{ height: 360 }}>
                                     <div className="card-body">
                                         <h5 className="card-title">Percentual por cotas</h5>
-                                        <div style={{ height: 260 }}>
-                                            <Pie data={pieData} options={pieOptions} key={JSON.stringify(pieData)} />
-                                        </div>
+                                        {total === 0 ? (
+                                            <div className="text-center text-muted py-5">Sem dados para o filtro selecionado.</div>
+                                        ) : (
+                                            <div style={{ height: 260 }}>
+                                                <Pie data={pieData} options={pieOptions} key={JSON.stringify(pieData)} />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -124,13 +162,12 @@ function Charts() {
                                         <h6>Notas</h6>
                                         <ul className="small mb-0">
                                             <li>
-                                                Os números são obtidos a partir da tabela students. Como a base é grande, a
-                                                consulta pode demorar.
+                                                Os números são obtidos a partir da tabela students. A consulta traz apenas os registros
+                                                do campus selecionado (ou todos se "Todos" estiver selecionado).
                                             </li>
                                             <li>
-                                                As siglas 'S', 'N' ou 'O' se referem, respectivamente, a uma forma de ingresso
-                                                que seja por cota, uma forma de ingresso que não seja por cota e formas de ingresso
-                                                que são excluídas dessa lógica, como transferência entre campi.
+                                                Para bases muito grandes, considere criar um endpoint no backend que retorne os percentuais
+                                                já agregados para melhorar desempenho.
                                             </li>
                                         </ul>
                                     </div>

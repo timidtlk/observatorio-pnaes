@@ -1,4 +1,3 @@
-import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import type { IMember } from '../api/Utils';
 import { API_URI } from '../api/MembersService';
