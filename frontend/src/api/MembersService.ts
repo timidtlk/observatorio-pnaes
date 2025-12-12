@@ -1,8 +1,8 @@
 import axios from "axios";
-import type { IMember } from "./Utils";
+import { BACK_URL, type IMember } from "./Utils";
 import { getConfig } from "./AuthService";
 
-export const API_URI: string = "http://localhost:8080/members";
+export const API_URI: string = `${BACK_URL}/members`;
 
 export async function createMember(member: IMember) {
     return axios.post(API_URI, member);

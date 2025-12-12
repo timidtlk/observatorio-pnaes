@@ -1,7 +1,7 @@
 import axios from "axios";
-import type { IStudent } from "./Utils";
+import { BACK_URL, type IStudent } from "./Utils";
 
-export const API_URI: string = "http://localhost:8080/students";
+export const API_URI: string = `${BACK_URL}/students`;
 
 export async function getAllCampus(): Promise<string[]> {
     return axios.get(`${API_URI}/campus`);

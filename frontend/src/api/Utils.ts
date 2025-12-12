@@ -1,3 +1,5 @@
+export const BACK_URL = "http://${BACK_URL:localhost:8080}";
+
 export interface IMember {
     id: string,
     name: string,

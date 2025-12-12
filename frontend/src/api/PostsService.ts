@@ -1,8 +1,8 @@
 import axios from "axios";
-import type { IPost } from "./Utils";
+import { BACK_URL, type IPost } from "./Utils";
 import { getConfig } from "./AuthService";
 
-export const API_URI: string = "http://localhost:8080/posts";
+export const API_URI: string = `${BACK_URL}/posts`;
 
 export async function createPost(post: Partial<IPost>) {
     return axios.post(API_URI, post, getConfig());
