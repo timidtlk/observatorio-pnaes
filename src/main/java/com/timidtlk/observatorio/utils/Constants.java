@@ -1,5 +1,6 @@
 package com.timidtlk.observatorio.utils;
 
 public class Constants {
-    public static final String IMAGE_PATH = "images/members/";
+    // Path relative to project root for storing member photos
+    public static final String IMAGE_PATH = "src/main/resources/images/members";
 }

@@ -3,9 +3,12 @@ import type { IMember } from '../api/Utils';
 import { API_URI } from '../api/MembersService';
 
 function MemberCard({ name, photoUrl, description, lattes, email }: IMember) {
+    const photoSrc = photoUrl && photoUrl.startsWith('http')
+        ? photoUrl
+        : `${API_URI}/image/${photoUrl ?? ''}`;
     return (
         <div className="card h-100 shadow-sm mx-auto" style={{ maxWidth: 350 }}>
-            <img src={API_URI + "/image/" + photoUrl} alt={name} className="card-img-top" style={{ objectFit: 'cover', height: '280px' }} />
+            <img src={photoSrc} alt={name} className="card-img-top" style={{ objectFit: 'cover', height: '280px' }} />
             <div className="card-body text-center">
                 <h5 className="card-title">{name}</h5>
                 <p className="card-text">{description}</p>

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_URL:localhost}:${DB_URL:5432}/observatorio
-    username: observatorio
-    password: securepassword
+    url: jdbc:postgresql://${DB_URL:localhost}:${DB_PORT:5432}/${POSTGRES_DATABASE:observatorio}
+    username: ${POSTGRES_USERNAME:observatorio}
+    password: ${POSTGRES_PASSWORD:password}
     platform: postgresql
   jpa:
     database-platform: org.hibernate.dialect.PosgreSQLInnoDBDialect
@@ -29,6 +29,19 @@ spring:
     init:
       data-locations: classpath:db/data.sql
       mode: always
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:observatoriopnaes@gmail.com}
+    password: ${MAIL_PASSWORD:changeme}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    default-encoding: UTF-8
+    from: ${MAIL_FROM:${MAIL_USERNAME:observatoriopnaes@gmail.com}}
 server:
   port: 8080
   error:
@@ -38,4 +51,9 @@ server:
 api:
   security:
     token:
-      secret: ${JWT_SECRET:my_secure_app}
+      secret: ${JWT_SECRET:example}
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG

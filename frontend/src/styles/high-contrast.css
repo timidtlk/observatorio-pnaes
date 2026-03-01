@@ -63,11 +63,30 @@ body.high-contrast .table,
 body.high-contrast .table th,
 body.high-contrast .table td {
   color: var(--hc-text) !important;
+  background-color: var(--hc-surface) !important;
   border-color: rgba(255,255,255,0.08) !important;
+}
+
+body.high-contrast .table thead th,
+body.high-contrast .table thead td,
+body.high-contrast .table-light,
+body.high-contrast .table-light th,
+body.high-contrast .table-light td {
+  background-color: #000 !important;
+  color: var(--hc-text) !important;
 }
 
 body.high-contrast .table-striped > tbody > tr:nth-of-type(odd) {
   background-color: rgba(255,255,255,0.02) !important;
+}
+
+body.high-contrast .table-striped > tbody > tr:nth-of-type(even) {
+  background-color: var(--hc-surface) !important;
+}
+
+body.high-contrast .table-hover > tbody > tr:hover > * {
+  background-color: rgba(255,255,255,0.12) !important;
+  color: var(--hc-text) !important;
 }
 
 /* Muted text */

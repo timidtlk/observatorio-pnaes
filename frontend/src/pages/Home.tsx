@@ -61,30 +61,6 @@ function Home() {
                             <i className="bi bi-play-btn me-2" /> Espaço multimídia
                         </Link>
                     </div>
-
-                    <div className="bg-white bg-opacity-10 rounded-pill d-inline-flex py-2 px-3 align-items-center">
-                        <span className="text-uppercase small me-3">O que você pode fazer</span>
-
-                        <div className="d-flex flex-row align-items-center gap-4">
-                            <div className="d-flex flex-column align-items-center text-white-75" style={{ minWidth: 160 }}>
-                                <i className="bi bi-search fs-2 text-primary mb-1"></i>
-                                <small className="fw-semibold">Pesquisar</small>
-                                <small className="d-block">Filtrar registros</small>
-                            </div>
-
-                            <div className="d-flex flex-column align-items-center text-white-75" style={{ minWidth: 160 }}>
-                                <i className="bi bi-bar-chart-line fs-2 text-success mb-1"></i>
-                                <small className="fw-semibold">Analisar</small>
-                                <small className="d-block">Visualizar gráficos</small>
-                            </div>
-
-                            <div className="d-flex flex-column align-items-center text-white-75" style={{ minWidth: 160 }}>
-                                <i className="bi bi-play-btn fs-2 text-danger mb-1"></i>
-                                <small className="fw-semibold">Conferir</small>
-                                <small className="d-block">Entrevistas e podcasts</small>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </Header>
 

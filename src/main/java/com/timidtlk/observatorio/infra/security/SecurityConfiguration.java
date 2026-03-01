@@ -53,10 +53,13 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(POST, "/auth/login").permitAll()
+                    .requestMatchers(POST, "/auth/forgot-password").permitAll()
+                    .requestMatchers(POST, "/auth/reset-password").permitAll()
                     .requestMatchers(POST, "/auth/register").hasRole("ADMIN")
                     .requestMatchers(POST, "/members").hasRole("ADMIN")
-                    .requestMatchers(DELETE, "/members").hasRole("ADMIN")
-                    .requestMatchers(PUT, "/members").authenticated()
+                    .requestMatchers(PUT, "/members/change-password").authenticated()
+                    .requestMatchers(PUT, "/members/**").authenticated()
+                    .requestMatchers(DELETE, "/members/**").hasRole("ADMIN")
                     .requestMatchers(GET, "/members").permitAll()
                     .requestMatchers(GET, "/members/this").authenticated()
                     .requestMatchers(GET, "/members/image/**").permitAll()
@@ -65,7 +68,8 @@ public class SecurityConfiguration {
                     .requestMatchers(PUT, "/posts").authenticated()
                     .requestMatchers(GET, "/posts/**").permitAll()
                     .requestMatchers(GET, "/posts/user/**").authenticated()
-                    .requestMatchers(POST, "/students").authenticated()
+                    .requestMatchers(POST, "/students/replace").hasRole("ADMIN")
+                    .requestMatchers(POST, "/students").hasRole("ADMIN")
                     .requestMatchers(GET, "/students").permitAll()
                     .requestMatchers(GET, "/students/**").permitAll()
                 )
@@ -79,7 +83,10 @@ public class SecurityConfiguration {
         var corsConfiguration = new CorsConfiguration();
 
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+        corsConfiguration.setAllowedOrigins(List.of(
+            "http://localhost:5173",
+            "https://hummel-isothiocyano-meridith.ngrok-free.dev"
+        ));
         corsConfiguration.setAllowedHeaders(
             List.of(
                 ORIGIN, 

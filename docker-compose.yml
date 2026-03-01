@@ -1,27 +1,110 @@
+version: '3.5'
+
 services:
-  frontend:
+  observatoriopnaesfront:
     image: ghcr.io/timidtlk/observatorio-pnaes:frontend
-    build: ./frontend
-    ports:
-      - "5173:80"
     depends_on:
-      - backend
-  db:
-    image: postgres
-    restart: always
-    ports:
-      - "5432:5432"
+      - observatoriopnaesback
     environment:
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DATABASE}
+      TZ: "America/Sao_Paulo"
+      DB_URL: "bancodedados"
+      BACK_URL: "back.example.com"
+      POSTGRES_USERNAME: "observatorio"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DATABASE: "observatorio"
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: stop-first
+      labels:
+        - traefik.frontend.rule=Host:example.com
+        - traefik.enable=true
+        - traefik.port=80
+        - traefik.tags=traefik-public
+        - traefik.docker.network=traefik-public
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
+        # Traefik V2
+        - traefik.http.middlewares.observatoriopnaesfront-redirect-web-secure.redirectscheme.scheme=https
+        - "traefik.http.routers.observatoriopnaesfront.middlewares=observatoriopnaesfront-redirect-web-secure"
+        - traefik.http.routers.observatoriopnaesfront.rule=Host(`example.com`)
+        - traefik.http.routers.observatoriopnaesfront.entrypoints=web
+        - traefik.http.services.observatoriopnaesfront.loadbalancer.server.port=80
+
+        - traefik.http.routers.observatoriopnaesfront-secured.rule=Host(`example.com`)
+        - traefik.http.routers.observatoriopnaesfront-secured.entrypoints=web-secured
+        - traefik.http.routers.observatoriopnaesfront-secured.middlewares=enablecorstotal
+        #- traefik.http.routers.observatoriopnaesfront-secured.tls=true
+        - traefik.http.routers.observatoriopnaesfront-secured.tls.certresolver=letsencrypt
+    networks:
+      - observatoriopnaes-network
+      - traefik-public
+
+  observatoriopnaesback:
+    image: ghcr.io/timidtlk/observatorio-pnaes:backend
+    depends_on:
+      - bancodedados
+    environment:
+      TZ: "America/Sao_Paulo"
+      DB_URL: "bancodedados"
+      BACK_URL: "back.example.com"
+      POSTGRES_USERNAME: "observatorio"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DATABASE: "observatorio"
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: stop-first
+      labels:
+        - traefik.enable=true
+        - traefik.http.middlewares.observatoriopnaesback-redirect-web-secure.redirectscheme.scheme=https
+        - "traefik.http.routers.observatoriopnaesback.middlewares=observatoriopnaesback-redirect-web-secure"
+        - traefik.http.routers.observatoriopnaesback.rule=Host(`back.example.com`)
+        - traefik.http.routers.observatoriopnaesback.entrypoints=web
+        - traefik.http.services.observatoriopnaesback.loadbalancer.server.port=8080
+        - traefik.http.routers.observatoriopnaesback-secured.rule=Host(`back.example.com`)
+        - traefik.http.routers.observatoriopnaesback-secured.entrypoints=web-secured
+        - traefik.http.routers.observatoriopnaesback-secured.tls.certresolver=letsencrypt
+        - traefik.http.routers.observatoriopnaesback-secured.middlewares=enablecorstotal
+    networks:
+      - observatoriopnaes-network
+      - traefik-public
+
+  bancodedados:
+    image: postgres
+    environment:
+      TZ: "America/Sao_Paulo"
+      POSTGRES_USER: "observatorio"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "observatorio"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U observatorio" ]
       interval: 1s
       timeout: 5s
       retries: 10
-  backend:
-    image: ghcr.io/timidtlk/observatorio-pnaes:backend
-    build: ./
-    ports:
-      - "8080:8080"
+    deploy:
+      replicas: 1
+
+    networks:
+      - observatoriopnaes-network
+      - traefik-public
+    volumes:
+      - database-storage:/var/lib/postgresql/
+networks:
+  observatoriopnaes-network:
+    attachable: true
+  traefik-public:
+    external: true
+
+volumes:
+  database-storage:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=***.***.***.***,rw,hard,nolock
+      device: :/DBs/observatoriopnaes

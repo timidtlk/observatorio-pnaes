@@ -11,6 +11,7 @@ import AddPost from './pages/AddPost';
 import Database from './pages/Database';
 import './styles/high-contrast.css';
 import Charts from './pages/Charts';
+import AdminTools from './pages/AdminTools';
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                     <Route path='/post/:link' element={<Post />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/member' element={<MembersArea />} />
+                    <Route path='/admin' element={<AdminTools />} />
                     <Route path='/database' element={<Database />} />
                 </Routes>
             </Layout>

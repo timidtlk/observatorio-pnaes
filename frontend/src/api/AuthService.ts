@@ -7,6 +7,14 @@ export async function login(user: ILoginCredentials) {
     return axios.post(`${API_URI}/login`, user);
 }
 
+export async function requestPasswordReset(loginOrEmail: string) {
+    return axios.post(`${API_URI}/forgot-password`, { loginOrEmail });
+}
+
+export async function resetPassword(loginOrEmail: string, code: string, newPassword: string) {
+    return axios.post(`${API_URI}/reset-password`, { loginOrEmail, code, newPassword });
+}
+
 export async function logout() {
     sessionStorage.removeItem('token');
     localStorage.removeItem('token');

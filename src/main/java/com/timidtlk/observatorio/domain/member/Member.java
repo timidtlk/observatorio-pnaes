@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.timidtlk.observatorio.enums.Role;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,6 +46,7 @@ public class Member implements UserDetails {
     @Column(nullable = false, unique = true)
     private String login;
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,6 +54,15 @@ public class Member implements UserDetails {
 
     @Column(name = "photoUrl")
     private String photoUrl;
+
+    @Column(name = "show_about")
+    private Boolean showAbout = true;
+
+    @PrePersist
+    @PreUpdate
+    private void ensureShowAbout() {
+        if (showAbout == null) showAbout = true;
+    }
 
     public Member(String login, String password, Role role) {
         this.login = login;

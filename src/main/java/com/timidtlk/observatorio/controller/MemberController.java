@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +29,10 @@ import org.springframework.web.client.RestClient.ResponseSpec;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.timidtlk.observatorio.domain.member.Member;
+import com.timidtlk.observatorio.domain.member.CreateMemberDTO;
+import com.timidtlk.observatorio.domain.member.UpdateMemberDTO;
+import com.timidtlk.observatorio.domain.user.ChangePasswordRequestDTO;
+import com.timidtlk.observatorio.enums.Role;
 import com.timidtlk.observatorio.infra.security.TokenService;
 import com.timidtlk.observatorio.service.MemberService;
 
@@ -42,7 +49,7 @@ public class MemberController {
     TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+    public ResponseEntity<Member> createMember(@RequestBody CreateMemberDTO member) {
         return ResponseEntity.created(URI.create("/members/userID")).body(memberService.createMember(member));
     }
 
@@ -65,6 +72,58 @@ public class MemberController {
         return ResponseEntity.ok().body(memberService.getMember(UUID.fromString(id)));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Member> updateMember(
+        @PathVariable(value = "id") String id,
+        @RequestBody UpdateMemberDTO dto,
+        @AuthenticationPrincipal Member requester
+    ) {
+        if (requester == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        boolean isAdmin = requester.getRole() == Role.ADMIN;
+        if (!isAdmin && !requester.getId().toString().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        UpdateMemberDTO effectiveDto = new UpdateMemberDTO(
+            UUID.fromString(id),
+            dto.name(),
+            dto.email(),
+            isAdmin ? dto.login() : requester.getLogin(),
+            dto.description(),
+            dto.lattes(),
+            isAdmin ? dto.role() : requester.getRole(),
+            dto.showAbout()
+        );
+
+        Member updated = isAdmin
+            ? memberService.updateMember(effectiveDto)
+            : memberService.updateOwnProfile(requester.getId(), effectiveDto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMember(@PathVariable(value = "id") String id, @AuthenticationPrincipal Member requester) {
+        if (requester == null || requester.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        memberService.deleteMember(memberService.getMember(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal Member requester, @RequestBody ChangePasswordRequestDTO dto) {
+        if (requester == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!dto.newPassword().equals(dto.confirmPassword())) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            memberService.changePassword(requester, dto.currentPassword(), dto.newPassword());
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     @PutMapping("/photo")
     public ResponseEntity<String> uploadPhoto(@RequestParam("id") String id, @RequestParam("file")MultipartFile file) {
         return ResponseEntity.ok().body(memberService.uploadPhoto(UUID.fromString(id), file));
@@ -73,8 +132,12 @@ public class MemberController {
     @GetMapping(path = "/image/{filename}", produces = { IMAGE_PNG_VALUE, IMAGE_JPEG_VALUE })
     public byte[] getPhoto(@PathVariable("filename") String filename) throws IOException {
         try {
-            return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(IMAGE_PATH + filename).toURI()));
-        } catch (IOException | URISyntaxException e) {
+            var path = Paths.get(IMAGE_PATH).toAbsolutePath().resolve(filename);
+            if (Files.exists(path)) {
+                return Files.readAllBytes(path);
+            }
+            return null;
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }

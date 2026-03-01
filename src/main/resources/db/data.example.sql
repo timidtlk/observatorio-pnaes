@@ -3,9 +3,8 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- 1º: Configuração dos membros (Insira os membros que você quer que inicializem com a aplicação)
 
 INSERT INTO members 
-    (id, name, description, email, lattes, login, password, role, photo_url) 
-VALUES 
-(
+    (id, name, description, email, lattes, login, password, role, photo_url, show_about) 
+SELECT
     gen_random_uuid(),
     'Ana', 
     'Graduada em biblioteconomia', 
@@ -14,5 +13,7 @@ VALUES
     'ana',
     '',
     'MEMBER',
-    'ana.jpg'
-);
+    'ana.jpg',
+    TRUE
+WHERE NOT EXISTS
+    (SELECT 1 FROM members WHERE name = 'Ana');

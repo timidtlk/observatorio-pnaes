@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import type { ILoginCredentials } from '../api/Utils';
-import { login } from '../api/AuthService';
+import { login, requestPasswordReset, resetPassword } from '../api/AuthService';
 import { useNavigate } from 'react-router-dom';
 import '../styles/high-contrast.css';
 
@@ -29,6 +29,16 @@ function Login() {
         (ToastNotification & { isHiding?: boolean })[]
     >([]);
     const toastIdCounter = useRef(0);
+
+    const [showForgot, setShowForgot] = useState(false);
+    const [forgotStep, setForgotStep] = useState<1 | 2>(1);
+    const [forgotLoading, setForgotLoading] = useState(false);
+    const [forgotData, setForgotData] = useState({
+        loginOrEmail: '',
+        code: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
 
     const navigate = useNavigate();
 
@@ -134,6 +144,62 @@ function Login() {
         setRememberMe(prev => !prev);
     };
 
+    const handleForgotInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setForgotData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const closeForgot = () => {
+        setShowForgot(false);
+        setForgotStep(1);
+        setForgotData({ loginOrEmail: '', code: '', newPassword: '', confirmPassword: '' });
+    };
+
+    const sendResetCode = async () => {
+        if (!forgotData.loginOrEmail) {
+            showToast('Informe e-mail ou usuário para enviar o código.', 'warning');
+            return;
+        }
+        setForgotLoading(true);
+        try {
+            await requestPasswordReset(forgotData.loginOrEmail);
+            showToast('Código enviado! Verifique seu e-mail.', 'info');
+            setForgotStep(2);
+        } catch (err) {
+            console.error(err);
+            showToast('Não foi possível enviar o código.');
+        } finally {
+            setForgotLoading(false);
+        }
+    };
+
+    const handleResetPassword = async () => {
+        if (forgotData.newPassword.length < 6) {
+            showToast('A nova senha deve ter pelo menos 6 caracteres.', 'warning');
+            return;
+        }
+        if (forgotData.newPassword !== forgotData.confirmPassword) {
+            showToast('A confirmação da nova senha não confere.', 'warning');
+            return;
+        }
+        if (!forgotData.code) {
+            showToast('Informe o código recebido por e-mail.', 'warning');
+            return;
+        }
+
+        setForgotLoading(true);
+        try {
+            await resetPassword(forgotData.loginOrEmail, forgotData.code, forgotData.newPassword);
+            showToast('Senha redefinida! Faça login com a nova senha.', 'success');
+            closeForgot();
+        } catch (err) {
+            console.error(err);
+            showToast('Código inválido ou expirado.');
+        } finally {
+            setForgotLoading(false);
+        }
+    };
+
     return (
         <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
             {/* Container de Toasts */}
@@ -170,6 +236,82 @@ function Login() {
                     </div>
                 ))}
             </div>
+
+            {showForgot && (
+                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-75" style={{ zIndex: 1200 }}>
+                    <div className="card shadow" style={{ width: '90%', maxWidth: '420px' }}>
+                        <div className="card-header d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0">Recuperar senha</h5>
+                            <button className="btn btn-sm btn-outline-secondary" onClick={closeForgot}>
+                                Fechar
+                            </button>
+                        </div>
+                        <div className="card-body">
+                            {forgotStep === 1 ? (
+                                <>
+                                    <p className="small text-muted">Informe seu e-mail ou nome de usuário para receber um código de 6 dígitos.</p>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">E-mail ou usuário</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="loginOrEmail"
+                                            value={forgotData.loginOrEmail}
+                                            onChange={handleForgotInputChange}
+                                        />
+                                    </div>
+                                    <button className="btn btn-primary w-100" onClick={sendResetCode} disabled={forgotLoading}>
+                                        {forgotLoading ? 'Enviando...' : 'Enviar código'}
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="small text-muted">Digite o código recebido e a nova senha.</p>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">Código</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="code"
+                                            value={forgotData.code}
+                                            onChange={handleForgotInputChange}
+                                            maxLength={6}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">Nova senha</label>
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            name="newPassword"
+                                            value={forgotData.newPassword}
+                                            onChange={handleForgotInputChange}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">Confirmar nova senha</label>
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            name="confirmPassword"
+                                            value={forgotData.confirmPassword}
+                                            onChange={handleForgotInputChange}
+                                        />
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <button className="btn btn-outline-secondary w-100" onClick={() => setForgotStep(1)} disabled={forgotLoading}>
+                                            Voltar
+                                        </button>
+                                        <button className="btn btn-success w-100" onClick={handleResetPassword} disabled={forgotLoading}>
+                                            {forgotLoading ? 'Salvando...' : 'Redefinir senha'}
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div
                 className="card shadow-lg"
@@ -270,9 +412,9 @@ function Login() {
                         </button>
 
                         <div className="text-center mt-3">
-                            <a href="#forgot-password" className="text-decoration-none">
+                            <button type="button" className="btn btn-link text-decoration-none" onClick={() => setShowForgot(true)}>
                                 Esqueceu sua senha?
-                            </a>
+                            </button>
                         </div>
                     </form>
                 </div>

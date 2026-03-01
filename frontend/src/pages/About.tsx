@@ -15,7 +15,8 @@ function About() {
     const getAllMembers = async () => {
         try {
             const { data } = await getMembers();
-            setMembers(data);
+            // Include by default unless explicitly false
+            setMembers((data as IMember[]).filter(m => m.showAbout !== false));
         } catch (error: unknown) {
             console.log(error);
         }
@@ -25,7 +26,7 @@ function About() {
         getAllMembers();
     }, [])
 
-    const totalSlides = Math.ceil(members.length / MEMBERS_PER_SLIDE);
+    const totalSlides = Math.max(1, Math.ceil(members.length / MEMBERS_PER_SLIDE));
 
     const handlePrev = () => {
         setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));

@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.timidtlk.observatorio.domain.student.Student;
+import com.timidtlk.observatorio.domain.member.Member;
+import com.timidtlk.observatorio.enums.Role;
 import com.timidtlk.observatorio.service.StudentService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
 @RequestMapping("/students")
@@ -20,16 +24,33 @@ public class StudentController {
     @Autowired
     StudentService studentService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @GetMapping("/count")
     public ResponseEntity<Integer> getCount() {
         return ResponseEntity.ok().body(studentService.getStudents("","","","").size());
     }
 
     @PostMapping
-    public ResponseEntity<Boolean> setDatabase(@RequestParam("csv") MultipartFile csv) {
+    public ResponseEntity<Boolean> setDatabase(@RequestParam("csv") MultipartFile csv, @AuthenticationPrincipal Member requester) {
+        if (requester == null || requester.getRole() != Role.ADMIN) return ResponseEntity.status(403).build();
         boolean status = studentService.setDatabase(csv);
-
         return (status) ? ResponseEntity.ok(status) : ResponseEntity.internalServerError().build();
+    }
+
+    @PostMapping("/replace")
+    public ResponseEntity<Boolean> replaceDatabase(
+        @RequestParam("csv") MultipartFile csv,
+        @RequestParam("password") String password,
+        @AuthenticationPrincipal Member requester
+    ) {
+        if (requester == null || requester.getRole() != Role.ADMIN) return ResponseEntity.status(403).build();
+        if (!passwordEncoder.matches(password, requester.getPassword())) return ResponseEntity.status(401).build();
+        if (!csv.getOriginalFilename().toLowerCase().endsWith(".csv")) return ResponseEntity.badRequest().build();
+
+        boolean status = studentService.setDatabase(csv);
+        return status ? ResponseEntity.ok(true) : ResponseEntity.internalServerError().build();
     }
 
     @GetMapping

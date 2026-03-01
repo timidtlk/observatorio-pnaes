@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BACK_URL, type IStudent } from "./Utils";
+import { getConfig } from "./AuthService";
 
 export const API_URI: string = `${BACK_URL}/students`;
 
@@ -21,4 +22,18 @@ export async function getCount(): Promise<number> {
 
 export async function getStudents(campus: string, curso: string, forma_ingresso: string, cotas: string): Promise<IStudent[]> {    
     return axios.get(`${API_URI}?campus=${campus}&curso=${curso}&forma_ingresso=${forma_ingresso}&cotas=${cotas}`);
+}
+
+export async function replaceStudents(csv: File, password: string) {
+    const formData = new FormData();
+    formData.append("csv", csv);
+    formData.append("password", password);
+
+    const config = getConfig();
+    return axios.post(`${API_URI}/replace`, formData, {
+        headers: {
+            ...config.headers,
+            "Content-Type": "multipart/form-data"
+        }
+    });
 }

@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.timidtlk.observatorio.domain.member.Member;
 import com.timidtlk.observatorio.domain.user.AuthenticationDTO;
+import com.timidtlk.observatorio.domain.user.ForgotPasswordRequestDTO;
 import com.timidtlk.observatorio.domain.user.LoginResponseDTO;
 import com.timidtlk.observatorio.domain.user.RegisterDTO;
+import com.timidtlk.observatorio.domain.user.ResetPasswordRequestDTO;
 import com.timidtlk.observatorio.infra.security.TokenService;
 import com.timidtlk.observatorio.repository.MemberRepository;
+import com.timidtlk.observatorio.service.PasswordResetService;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,6 +35,8 @@ public class AuthenticationController {
     MemberRepository repository;
     @Autowired
     PasswordEncoder encoder;
+    @Autowired
+    PasswordResetService passwordResetService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data) {
@@ -41,6 +46,18 @@ public class AuthenticationController {
         var token = tokenService.generateToken((Member) auth.getPrincipal());
         
         return ResponseEntity.ok(new LoginResponseDTO(token));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO data) {
+        passwordResetService.requestReset(data.loginOrEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDTO data) {
+        passwordResetService.resetPassword(data.loginOrEmail(), data.code(), data.newPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @SuppressWarnings("rawtypes")

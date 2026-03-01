@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { Link, useNavigate } from "react-router-dom";
-import { API_URI, getMemberByToken } from "../api/MembersService";
+import { API_URI, getMemberByToken, changePassword, updateMember, updatePhotoById } from "../api/MembersService";
 import { getPostsByUser } from "../api/PostsService";
 import { logout } from "../api/AuthService";
 import '../styles/high-contrast.css';
@@ -17,6 +17,8 @@ function MembersArea() {
     const [posts, setPosts] = useState<IPost[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [changingPassword, setChangingPassword] = useState(false);
+    const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
@@ -28,7 +30,12 @@ function MembersArea() {
                 const memberData: IMember = await getMemberByToken() as unknown as IMember;
                 setMember(memberData);
                 setEditMember(memberData);
-                setPhotoPreview(memberData.photoUrl ? `${API_URI}/image/${memberData.photoUrl}` : null);
+                const preview = memberData.photoUrl
+                    ? (memberData.photoUrl.startsWith("http")
+                        ? memberData.photoUrl
+                        : `${API_URI}/image/${memberData.photoUrl}`)
+                    : null;
+                setPhotoPreview(preview);
                 setPosts((await getPostsByUser(memberData.id)).data as unknown as IPost[])
             } catch (err: unknown) {
                 console.log(err);
@@ -52,8 +59,11 @@ function MembersArea() {
     // Atualiza campos do membro editável
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (!editMember) return;
-        const { name, value } = e.target;
-        setEditMember({ ...editMember, [name]: value });
+        const { name } = e.target;
+        const value = e.target instanceof HTMLInputElement && e.target.type === "checkbox"
+            ? e.target.checked
+            : e.target.value;
+        setEditMember({ ...editMember, [name]: value } as IMember);
     };
 
     // Salva alterações do membro
@@ -63,19 +73,10 @@ function MembersArea() {
         setSaving(true);
 
         try {
-            await fetch(`/api/members/${editMember.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(editMember),
-            });
+            await updateMember(editMember);
 
             if (photoFile) {
-                const formData = new FormData();
-                formData.append("file", photoFile);
-                await fetch(`/api/members/${editMember.id}/photo`, {
-                    method: "POST",
-                    body: formData,
-                });
+                await updatePhotoById(editMember.id, photoFile);
             }
 
             setMember(editMember);
@@ -84,6 +85,33 @@ function MembersArea() {
             alert(`Erro ao salvar dados: ${err}`);
         }
         setSaving(false);
+    };
+
+    const handlePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPasswords(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleChangePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwords.next.length < 6) {
+            alert("A nova senha deve ter pelo menos 6 caracteres.");
+            return;
+        }
+        if (passwords.next !== passwords.confirm) {
+            alert("A confirmação da senha não confere.");
+            return;
+        }
+        try {
+            setChangingPassword(true);
+            await changePassword(passwords.current, passwords.next);
+            alert("Senha alterada com sucesso.");
+            setPasswords({ current: "", next: "", confirm: "" });
+        } catch (err: unknown) {
+            alert("Não foi possível alterar a senha. Verifique a senha atual e tente novamente.");
+        } finally {
+            setChangingPassword(false);
+        }
     };
 
     // Logout
@@ -127,12 +155,17 @@ function MembersArea() {
         );
     }
 
-    console.log(posts);
-
     return (
         <>
             <Header title="Área do Membro">
                 <p>Gerencie seus dados e suas postagens no Observatório.</p>
+                {member.role === 'ADMIN' && (
+                    <div className="mt-3">
+                        <Link to="/admin" className="btn btn-warning btn-sm">
+                            <i className="bi bi-shield-lock me-1"></i> Ferramentas de administrador
+                        </Link>
+                    </div>
+                )}
             </Header>
             <section className="container py-5">
                 <div className="row g-4">
@@ -205,6 +238,19 @@ function MembersArea() {
                                             onChange={handleInputChange}
                                         />
                                     </div>
+                                    <div className="form-check mb-3 text-start">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="showAbout"
+                                            name="showAbout"
+                                            checked={!!editMember.showAbout}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label className="form-check-label" htmlFor="showAbout">
+                                            Exibir no "Sobre nós"
+                                        </label>
+                                    </div>
                                     <button
                                         type="submit"
                                         className="btn btn-primary w-100"
@@ -228,6 +274,52 @@ function MembersArea() {
                                 >
                                     <i className="bi bi-box-arrow-right me-1"></i> Sair
                                 </button>
+                            </div>
+                        </div>
+
+                        <div className="card shadow-sm mt-3">
+                            <div className="card-header bg-white">
+                                <h5 className="mb-0">Trocar senha</h5>
+                            </div>
+                            <div className="card-body">
+                                <form onSubmit={handleChangePassword}>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">Senha atual</label>
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            name="current"
+                                            value={passwords.current}
+                                            onChange={handlePasswordInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">Nova senha</label>
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            name="next"
+                                            value={passwords.next}
+                                            onChange={handlePasswordInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold">Confirmar nova senha</label>
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            name="confirm"
+                                            value={passwords.confirm}
+                                            onChange={handlePasswordInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <button type="submit" className="btn btn-outline-primary w-100" disabled={changingPassword}>
+                                        {changingPassword ? "Alterando..." : "Alterar senha"}
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

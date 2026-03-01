@@ -1,4 +1,5 @@
-export const BACK_URL = "http://${BACK_URL:localhost:8080}";
+const rawBackUrl = import.meta.env.VITE_BACK_URL || "http://localhost:8080";
+export const BACK_URL = rawBackUrl.startsWith("http") ? rawBackUrl : `https://${rawBackUrl}`;
 
 export interface IMember {
     id: string,
@@ -6,7 +7,10 @@ export interface IMember {
     description: string,
     email: string,
     lattes: string,
-    photoUrl: string
+    photoUrl: string,
+    login: string,
+    role: 'ADMIN' | 'MEMBER',
+    showAbout: boolean
 }
 
 export interface IPost {
